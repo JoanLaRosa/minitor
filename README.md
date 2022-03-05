@@ -1,4 +1,4 @@
-# MiniTorrent
+# MiniTor
 A mini client to interact with the Onion Router (Tor)
 
 ## Project Scope
