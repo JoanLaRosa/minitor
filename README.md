@@ -13,3 +13,10 @@ const response = await tor.fetch(url);
 ```
 
 Where  response  is the standard Node.js format from the standard library.
+
+# Setup
+Install the dependencies with
+
+```bash
+npm install
+```
