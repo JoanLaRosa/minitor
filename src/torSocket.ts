@@ -1,4 +1,4 @@
-import OnionRouter from "./onionRouter";
+import OnionRouter from "./OnionRouter";
 
 interface TorSocket {
   guardRelay: OnionRouter;

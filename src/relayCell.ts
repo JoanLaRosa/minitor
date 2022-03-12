@@ -1,5 +1,5 @@
-import Cell from "./cell";
-import OnionRouter from "./onionRouter";
+import Cell from "./Cell";
+import OnionRouter from "./OnionRouter";
 
 interface RelayCell {
   cell: Cell;

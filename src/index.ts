@@ -1,4 +1,4 @@
-import Consensus from "./consensus";
+import Consensus from "./Consensus";
 export default class MiniTor {
   _consensus: Consensus;
 

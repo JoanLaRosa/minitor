@@ -1,7 +1,7 @@
 import { create, AxiosInstance } from "axios";
 
-import DirectoryAuthority from "./directoryAuthority";
-import OnionRouter from "./onionRouter";
+import DirectoryAuthority from "./DirectoryAuthority";
+import OnionRouter from "./OnionRouter";
 
 interface Consensus {
   _directoryAuthorities: DirectoryAuthority[];

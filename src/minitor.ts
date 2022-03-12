@@ -1,5 +1,5 @@
-import Consensus from "./consensus";
-import TorSocket from "./torSocket";
+import Consensus from "./Consensus";
+import TorSocket from "./TorSocket";
 
 interface MiniTor {
   _consensus: Consensus;
