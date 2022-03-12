@@ -1,7 +1,12 @@
+import { create, AxiosInstance } from "axios";
+
 import DirectoryAuthority from "./directoryAuthority";
+import OnionRouter from "./onionRouter";
 
 interface Consensus {
   _directoryAuthorities: DirectoryAuthority[];
+  _parsedConsensus: OnionRouter[];
+  _httpClient: AxiosInstance;
 }
 
 class Consensus {
@@ -18,6 +23,13 @@ class Consensus {
       new DirectoryAuthority("dannenberg", "193.23.244.244", 80, 443),
       new DirectoryAuthority("faravahar", "154.35.175.225", 80, 443),
     ];
+    this._parsedConsensus = [];
+    this._httpClient = create({
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
+      },
+    });
   }
 
   getRandomDirectoryAuthority() {
@@ -26,16 +38,76 @@ class Consensus {
     ];
   }
 
-  parseConsensus(consensusUrl: string, limit = 200) {
-    return;
+  async parseConsensus(consensusUrl: string, limit = 200) {
+    const response = await this._httpClient.get(consensusUrl);
+
+    let onionRouterCount = 1;
+    let onionRouter: OnionRouter | null = null;
+
+    for (let line of response.data.split("\n")) {
+      line = line.decode();
+      if (line.startsWith("r ")) {
+        const splitLine = line.split(" ");
+        const nickname = splitLine[1];
+        const ip = splitLine[6];
+        const torPort = parseInt(splitLine[7]);
+        const dirPort = parseInt(splitLine[8]);
+        const identity = splitLine[2] + "=".repeat(-splitLine[2].length % 4);
+        const identityBase16 = Buffer.from(identity, "base64").toString("hex");
+
+        if (dirPort === 0) {
+          onionRouter = null;
+          continue;
+        }
+
+        onionRouter = new OnionRouter(
+          nickname,
+          ip,
+          dirPort,
+          torPort,
+          identityBase16
+        );
+      } else if (line.startsWith("s ")) {
+        if (onionRouter) {
+          const flags: string[] = [];
+          for (const token of line.split(" ")) {
+            if (token == "s") {
+              continue;
+            }
+            flags.push(token.lower().replace("\n", ""));
+          }
+
+          if (
+            ["stable", "fast", "valid", "running"].every((flag) =>
+              flags.includes(flag)
+            )
+          ) {
+            onionRouter.flags = flags;
+            onionRouterCount += 1;
+            this._parsedConsensus.push(onionRouter);
+          }
+        }
+      }
+      if (onionRouterCount >= limit) {
+        return;
+      }
+    }
   }
 
   getRandomGuardRelay() {
-    return;
+    const guardRelays: OnionRouter[] = [];
+    for (const onionRouter of this._parsedConsensus) {
+      if (onionRouter.nickname.includes("guard")) {
+        guardRelays.push(onionRouter);
+      }
+    }
+    return guardRelays[Math.floor(Math.random() * guardRelays.length)];
   }
 
   getRandomOnionRouter() {
-    return;
+    return this._parsedConsensus[
+      Math.floor(Math.random() * this._parsedConsensus.length)
+    ];
   }
 }
 
