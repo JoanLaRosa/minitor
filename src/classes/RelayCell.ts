@@ -1,4 +1,4 @@
-import Cell from "./Cell";
+import Cell from "./classes/Cell";
 import OnionRouter from "./OnionRouter";
 
 interface RelayCell {
