@@ -34,6 +34,7 @@ class Consensus {
     this.command = command;
     this.payload = payload;
   }
+
   // FIXME: change Int8Array to the bytes struct
   getBytes(maxProtocolVersion: number): Int8Array {
     return;

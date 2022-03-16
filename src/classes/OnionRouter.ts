@@ -4,10 +4,21 @@ interface OnionRouter {
   dirPort: number;
   torPort: number;
   identity: string;
+  flags?: string[];
+  forwardDigest: any;
+  backwardDigest: any;
+  encryptionKey: any;
+  decryptionKey: any;
 }
 
 class OnionRouter {
-  constructor({ nickname, ip, dirPort, torPort, identity }: OnionRouter) {
+  constructor(
+    nickname: string,
+    ip: string,
+    dirPort: number,
+    torPort: number,
+    identity: string
+  ) {
     this.nickname = nickname;
     this.ip = ip;
     this.dirPort = dirPort;
