@@ -1,5 +1,7 @@
-import Consensus from "./Consensus";
-import TorSocket from "./TorSocket";
+import Consensus from "./classes/Consensus";
+import TorSocket from "./classes/TorSocket";
+import OnionRouter from "./classes/OnionRouter";
+import Circuit from "./classes/Circuit";
 
 interface MiniTor {
   _consensus: Consensus;
@@ -19,14 +21,22 @@ class MiniTor {
   }
 
   get() {
-    let notFound = true;
-    while (notFound) {
-      const guardRelay = this._consensus.getRandomGuardRelay();
-      guardRelay.notFound = false;
+    let guardRelay: OnionRouter | undefined;
+    while (!guardRelay) {
+      try {
+        guardRelay = this._consensus.getRandomGuardRelay();
+      } catch (error) {
+        continue;
+      }
     }
-
     const torSocket = new TorSocket({ guardRelay });
     torSocket.connect();
+
+    // const circuit = new Circuit({ torSocket });
+    // circuit.create(guardRelay);
+
+    // const extendRelay = this._consensus.getRandomOnionRouter();
+    // circuit.extend(extendRelay);
   }
 }
 

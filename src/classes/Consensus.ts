@@ -1,4 +1,4 @@
-import { create, AxiosInstance } from "axios";
+import axios, { AxiosInstance } from "axios";
 
 import DirectoryAuthority from "./DirectoryAuthority";
 import OnionRouter from "./OnionRouter";
@@ -24,7 +24,7 @@ class Consensus {
       new DirectoryAuthority("faravahar", "154.35.175.225", 80, 443),
     ];
     this._parsedConsensus = [];
-    this._httpClient = create({
+    this._httpClient = axios.create({
       headers: {
         "User-Agent":
           "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",

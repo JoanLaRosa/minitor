@@ -1,3 +1,5 @@
+import TorSocket from "./TorSocket";
+
 interface Circuit {
   torSocket: any;
   circuitId: number;
@@ -5,7 +7,7 @@ interface Circuit {
 }
 
 class Circuit {
-  constructor(torSocket: any) {
+  constructor({ torSocket }: { torSocket: TorSocket }) {
     this.torSocket = torSocket;
     this.circuitId = 0;
     this.onionRouters = [];
