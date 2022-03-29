@@ -6,7 +6,7 @@ interface RelayCell {
 }
 
 class RelayCell extends Cell {
-  constructor({ cell }: RelayCell) {
+  constructor({ cell }: { cell: Cell }) {
     super(cell);
   }
 
