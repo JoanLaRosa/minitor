@@ -46,3 +46,4 @@ class Cell {
 }
 
 export default Cell;
+export {MAX_PAYLOAD_SIZE, CELL_SIZE};

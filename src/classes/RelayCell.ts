@@ -9,7 +9,7 @@ interface RelayCell {
 }
 
 class RelayCell extends Cell {
-  constructor({ cell }: RelayCell) {
+  constructor({ cell }: { cell: Cell }) {
     super(cell);
   }
 
@@ -20,11 +20,11 @@ class RelayCell extends Cell {
   // }
 
   parseCell() {
-    let relay_command: string = struct.unpack("!B", this.payload.slice(0, 1))[0]    let recognized: number = struct.unpack("!H", this.payload[1:][: 2])[0]
-    let stream_id: number = struct.unpack("!H", this.payload[3:][: 2])[0]
-    let digest:string = struct.unpack("!4s", this.payload[5:][: 4])[0]
-    let length = struct.unpack("!H", this.payload[9:][: 2])[0]
-    let data = struct.unpack("!498s", this.payload[11:])[0]
+    // let relay_command: string = struct.unpack("!B", this.payload.slice(0, 1))[0]    let recognized: number = struct.unpack("!H", this.payload[1:][: 2])[0]
+    // let stream_id: number = struct.unpack("!H", this.payload[3:][: 2])[0]
+    // let digest:string = struct.unpack("!4s", this.payload[5:][: 4])[0]
+    // let length = struct.unpack("!H", this.payload[9:][: 2])[0]
+    // let data = struct.unpack("!498s", this.payload[11:])[0]
 
   }
 }
