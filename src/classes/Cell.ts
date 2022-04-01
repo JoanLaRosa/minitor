@@ -2,7 +2,7 @@ const CELL_SIZE = 514;
 const MAX_PAYLOAD_SIZE = 509;
 
 type Payload1 = {
-  type: string;
+  type: number;
   length: string;
   data: string;
 };
@@ -20,16 +20,16 @@ type Payload4 = {
   ourIp: string;
 };
 
-type Payload = Payload1 | Payload2 | Payload3 | Payload4;
+export type Payload = Payload1 | Payload2 | Payload3 | Payload4;
 
-interface Consensus {
+interface Cell {
   circuitId: number;
   command: number;
   payload: Payload;
 }
 
-class Consensus {
-  constructor({ circuitId, command, payload }: Consensus) {
+class Cell {
+  constructor({ circuitId, command, payload }: Cell) {
     this.circuitId = circuitId;
     this.command = command;
     this.payload = payload;
@@ -41,8 +41,8 @@ class Consensus {
   }
 
   isVariableLengthCommand(command: number): bool {
-    return;
+    return 1;
   }
 }
 
-export default Consensus;
+export default Cell;
