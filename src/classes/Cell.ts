@@ -1,26 +1,28 @@
+import { DynamicType } from "../Types";
+
 const CELL_SIZE = 514;
 const MAX_PAYLOAD_SIZE = 509;
 
 type Payload1 = {
-  type: number;
-  length: string;
-  data: string;
+  type?: number;
+  length?: string;
+  data?: string;
 };
 type Payload2 = {
-  encryptedPayload: string;
+  encryptedPayload?: string;
 };
 
 type Payload3 = {
-  versions: [string];
+  versions?: [string];
 };
 
 type Payload4 = {
-  timestamp: string;
-  otherIp: string;
-  ourIp: string;
+  timestamp?: string;
+  otherIp?: string;
+  ourIp?: string;
 };
 
-export type Payload = Payload1 | Payload2 | Payload3 | Payload4;
+export type Payload = DynamicType; //Payload1 | Payload2 | Payload3 | Payload4;
 
 interface Cell {
   circuitId: number;
@@ -29,7 +31,7 @@ interface Cell {
 }
 
 class Cell {
-  constructor({ circuitId, command, payload }: Cell) {
+  constructor(circuitId: number, command: number, payload: Payload) {
     this.circuitId = circuitId;
     this.command = command;
     this.payload = payload;
@@ -37,13 +39,13 @@ class Cell {
 
   // FIXME: change Int8Array to the bytes struct
   getBytes(maxProtocolVersion: number): Int8Array {
-    return;
+    return Int8Array.from([]);
   }
 
-  isVariableLengthCommand(command: number): bool {
-    return 1;
+  isVariableLengthCommand(command: number): boolean {
+    return true;
   }
 }
 
 export default Cell;
-export {MAX_PAYLOAD_SIZE, CELL_SIZE};
+export { MAX_PAYLOAD_SIZE, CELL_SIZE };
