@@ -58,7 +58,7 @@ class RelayCell extends Cell {
     ) {
       // Do nothing
     } else {
-      console.log("Unsupported relay cell: %d", relay_command);
+      // console.log("Unsupported relay cell: %d", relay_command);
     }
 
     return response_data;

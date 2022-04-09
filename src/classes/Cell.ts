@@ -25,7 +25,7 @@ const MAX_PAYLOAD_SIZE = 509;
 //   ourIp?: string;
 // };
 
-// TODO: Change Payload type to Payload1 | Payload2 | Payload3 | Payload4
+// FIXME: Change Payload type to Payload1 | Payload2 | Payload3 | Payload4
 export type Payload = DynamicType; //Payload1 | Payload2 | Payload3 | Payload4;
 
 interface Cell {
@@ -53,10 +53,10 @@ class Cell {
     } else if (this.command == CommandTypes.NETINFO) {
       const timestamp = struct.pack("!I", this.payload["timestamp"]);
       const other_or_address = "";
-      // const other_or_address =  struct.pack("!BB", 4, 4) + socket.inet_aton(this.payload["other_ip"]);
+      //FIXME: const other_or_address =  struct.pack("!BB", 4, 4) + socket.inet_aton(this.payload["other_ip"]);
       const number_of_addresses = struct.pack("!B", 1);
       const this_or_address = "";
-      // const this_or_address = struct.pack("!BB", 4, 4) + socket.inet_aton(this.payload["our_ip"]);
+      // FIXME: const this_or_address = struct.pack("!BB", 4, 4) + socket.inet_aton(this.payload["our_ip"]);
       payload_bytes =
         timestamp + other_or_address + number_of_addresses + this_or_address;
     } else if (this.command == CommandTypes.CREATE2) {
@@ -111,11 +111,7 @@ class Cell {
   }
 
   isVariableLengthCommand(command: number): boolean {
-    if (command == CommandTypes.VERSIONS || command >= 128) {
-      return true;
-    } else {
-      return false;
-    }
+    return command == CommandTypes.VERSIONS || command >= 128;
   }
 }
 

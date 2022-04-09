@@ -67,7 +67,7 @@ class TorSocket {
   }
 
   retrieveRelayData(circuit: Circuit) {
-    let response = "";
+    const response = "";
     // while (true) {
     //   const cell = new RelayCell({ cell: this.retrieveCell() });
     //   if (cell.command === CommandTypes.RELAY) {
