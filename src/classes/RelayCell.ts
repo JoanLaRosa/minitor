@@ -3,7 +3,7 @@ import OnionRouter from "./OnionRouter";
 
 import { MAX_PAYLOAD_SIZE } from "./Cell";
 import { CommandTypes } from "../constants";
-import { DynamicType } from "../Types";
+import { DynamicType } from "../types";
 import struct = require("python-struct");
 
 export const MAX_RELAY_CELL_DATA = MAX_PAYLOAD_SIZE - 11;
