@@ -25,7 +25,6 @@ class TorSocket {
     //     socket.socket(socket.AF_INET, socket.SOCK_STREAM),
     //     ssl_version=ssl.PROTOCOL_TLSv1_2
     // )
-    // this._socket =
     this._protocolVersions = [3];
     this._ourPublicIp = "0";
     this._circuits = [];
@@ -68,7 +67,7 @@ class TorSocket {
   }
 
   retrieveRelayData(circuit: Circuit) {
-    let response = "";
+    const response = "";
     // while (true) {
     //   const cell = new RelayCell({ cell: this.retrieveCell() });
     //   if (cell.command === CommandTypes.RELAY) {
