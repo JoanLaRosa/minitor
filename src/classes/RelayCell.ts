@@ -17,9 +17,11 @@ class RelayCell extends Cell {
     super(cell.circuitId, cell.command, cell.payload.encryptedPayload);
   }
 
+  // FIXME: is this function necessary?
   decrypt(onionRouters: OnionRouter[]) {
     for (const router of onionRouters.reverse()) {
-      this.payload = router.decrypt(this.payload);
+      // FIXME: this.payload = router.decrypt(this.payload);
+      this.payload = router.decrypt(new Uint8Array(0));
     }
   }
 

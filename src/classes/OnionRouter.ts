@@ -70,7 +70,7 @@ class OnionRouter {
     // return digest.digest()
   }
 
-  encrypt(relayPayload: any) {
+  encrypt(relayPayload: Uint8Array) {
     // cipher = Cipher(AES(self.encryption_key), CTR(b'\x00' * 16), backend=default_backend()).encryptor()
     // return cipher.update(relay_payload)
     // const emptyBytes = new Uint8Array(16);
@@ -80,7 +80,7 @@ class OnionRouter {
     return ciphertext;
   }
 
-  decrypt(relayPayload: any) {
+  decrypt(relayPayload: Uint8Array) {
     const plaintext = Crypto.AES.decrypt(relayPayload, this.decryptionKey, {
       mode: Crypto.mode.CTR,
     });
