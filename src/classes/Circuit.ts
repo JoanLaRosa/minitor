@@ -1,11 +1,11 @@
-import { CommandTypes } from "../constants";
+import { CommandTypes, RelayCommand } from "../constants";
 import { Payload } from "./Cell";
 
 import Cell from "./Cell";
 import RelayCell from "./RelayCell";
 import TorSocket from "./TorSocket";
 
-import struct = require("python-struct");
+import * as struct from "python-struct";
 
 interface Circuit {
   torSocket: any; // FIXME update to TorSocket type
@@ -22,13 +22,13 @@ class Circuit {
     this.streamId = 0;
   }
 
-  create(guard_relay) {
+  create(guardRelay) {
     //FIXME make KeyAgreementNTOR class
-    let key_agreement: any; // key_agreement = KeyAgreementNTOR(guard_relay);
+    let keyAgreement: any; // key_agreement = KeyAgreementNTOR(guard_relay);
     const payload: Payload = {
       type: 2,
-      length: key_agreement.get_onion_skin().length,
-      data: key_agreement.get_onion_skin(),
+      length: keyAgreement.getOnionSkin().length,
+      data: keyAgreement.getOnionSkin(),
     };
     this.torSocket.sendCell(
       new Cell(this.circuitId, CommandTypes.CREATE2, payload)
@@ -39,27 +39,27 @@ class Circuit {
       // log.error("Received command is not a CREATED2.");
       throw new Error("Received command is not a CREATED2.");
     }
-    key_agreement.complete_handshake(cell.payload["Y"], cell.payload["auth"]);
-    this.onionRouters.push(guard_relay);
+    keyAgreement.complete_handshake(cell.payload["Y"], cell.payload["auth"]);
+    this.onionRouters.push(guardRelay);
 
     return;
   }
 
-  createRelayCell(command, stream_id, payload) {
-    let relayCell: string = struct.pack("!B", command);
+  createRelayCell(command, streamId, payload) {
+    let relayCell: string = struct.pack("!B", command).toString();
     relayCell += struct.pack("!H", 0);
     // Rather, RELAY cells that affect the
     // entire circuit rather than a particular stream use a StreamID of zero
-    relayCell += struct.pack("!H", stream_id);
+    relayCell += struct.pack("!H", streamId);
     // FIXME: relay_cell += struct.pack("!4s", "\x00" * 4)
     relayCell += struct.pack("!H", payload.length);
     relayCell += struct.pack("!498s", payload);
 
     // Calculate and replace the digest.
-    const calculated_digest = this.onionRouters[-1]
+    const calculatedDigest = this.onionRouters[this.onionRouters.length - 1]
       .getForwardDigest(relayCell)
       .slice(0, 4);
-    relayCell = relayCell.slice(0, 5) + calculated_digest + relayCell.slice(9);
+    relayCell = relayCell.slice(0, 5) + calculatedDigest + relayCell.slice(9);
 
     // Encrypt the relay cell to the last onion router in the circuit.
     relayCell = this.encryptPayload(relayCell);
@@ -74,49 +74,49 @@ class Circuit {
     // ADDRPORT[nul - terminated string]
     // FLAGS[4 bytes]
     // ADDRPORT is made of ADDRESS | ':' | PORT | [00]
-    let relay_payload = `${address}:${port}`;
-    relay_payload += struct.pack("!BI", 0, 0);
-    const relay_cell = this.createRelayCell(
-      CommandTypes.RELAY_BEGIN,
+    let relayPayload = `${address}:${port}`;
+    relayPayload += struct.pack("!BI", 0, 0);
+    const relayCell = this.createRelayCell(
+      RelayCommand.RELAY_BEGIN,
       this.streamId,
-      relay_payload
+      relayPayload
     );
-    this.torSocket.send_cell(
+    this.torSocket.sendCell(
       new Cell(this.circuitId, CommandTypes.RELAY, {
-        encrypted_payload: relay_cell,
+        encryptedPayload: relayCell,
       })
     );
-    const response_cell = new RelayCell(this.torSocket.retrieveCell());
-    response_cell.payload = this.decryptPayload(response_cell.payload);
-    const parsed_response = response_cell.parseCell();
-    if (parsed_response["command"] != CommandTypes.RELAY_CONNECTED) {
+    const responseCell = new RelayCell(this.torSocket.retrieveCell());
+    responseCell.payload = this.decryptPayload(responseCell.payload);
+    const parsedResponse = responseCell.parseCell();
+    if (parsedResponse.command !== RelayCommand.RELAY_CONNECTED) {
       // log.error("Creating a connection to the address failed.")
       throw new Error("Creating a connection to the address failed.");
     }
   }
 
   sendHttpGet() {
-    const relay_payload = "GET / HTTP/1.0\r\n\r\n";
-    const relay_cell = this.createRelayCell(
-      CommandTypes.RELAY_DATA,
+    const relayPayload = "GET / HTTP/1.0\r\n\r\n";
+    const relayCell = this.createRelayCell(
+      RelayCommand.RELAY_DATA,
       this.streamId,
-      relay_payload
+      relayPayload
     );
-    this.torSocket.send_cell(
+    this.torSocket.sendCell(
       new Cell(this.circuitId, CommandTypes.RELAY, {
-        encrypted_payload: relay_cell,
+        encryptedPayload: relayCell,
       })
     );
-    const response_data = this.torSocket.retrieve_relay_data(self);
-    return response_data;
+    const responseData = this.torSocket.retrieveRelayData(self);
+    return responseData;
   }
 
   extend(onionRouter) {
     // log.debug("Extending the circuit to \"%s\"...", onion_router.nickname)
     // const key_agreement = KeyAgreementNTOR(onionRouter);
-    let key_agreement: any; // FIXME make KeyAgreementNTOR class
+    let keyAgreement: any; // FIXME make KeyAgreementNTOR class
 
-    let relay_payload = struct.pack("!B", 2);
+    let relayPayload = struct.pack("!B", 2);
     // FIXME:
     // relay_payload += struct.pack(
     //   "!BB4sH",
@@ -131,36 +131,33 @@ class Circuit {
     //   20,
     //   b16decode(onion_router.identity.encode())
     // );
-    relay_payload +=
-      struct.pack("!HH", 2, key_agreement.get_onion_skin().length) +
-      key_agreement.get_onion_skin();
+    relayPayload +=
+      struct.pack("!HH", 2, keyAgreement.getOnionSkin().length) +
+      keyAgreement.getOnionSkin();
 
-    const relay_cell = this.createRelayCell(
-      CommandTypes.RELAY_EXTEND2,
+    const relayCell = this.createRelayCell(
+      RelayCommand.RELAY_EXTEND2,
       0,
-      relay_payload
+      relayPayload
     );
 
     // When speaking v2 of the link protocol or later, clients MUST only send
     // EXTEND2 cells inside RELAY_EARLY cells.
-    this.torSocket.send_cell(
+    this.torSocket.sendCell(
       new Cell(this.circuitId, CommandTypes.RELAY_EARLY, {
-        encrypted_payload: relay_cell,
+        encryptedPayload: relayCell,
       })
     );
 
-    const response_cell = new RelayCell(this.torSocket.retrieveCell());
-    if (response_cell.command != CommandTypes.RELAY) {
+    const responseCell = new RelayCell(this.torSocket.retrieveCell());
+    if (responseCell.command != CommandTypes.RELAY) {
       // log.error("Received command is not a RELAY.")
       throw new Error("Received command is not a RELAY.");
     }
-    response_cell.payload = this.decryptPayload(response_cell.payload);
-    const parsed_response = response_cell.parseCell();
+    responseCell.payload = this.decryptPayload(responseCell.payload);
+    const parsedResponse = responseCell.parseCell();
 
-    key_agreement.complete_handshake(
-      parsed_response["Y"],
-      parsed_response["auth"]
-    );
+    keyAgreement.completeHandshake(parsedResponse["Y"], parsedResponse["auth"]);
     this.onionRouters.push(onionRouter);
   }
 
@@ -176,7 +173,7 @@ class Circuit {
       relayPayload = router.decrypt(relayPayload);
       // if 'recognized' = ZERO then probability is high that the relay cell was decrypted
       if (relayPayload.slice(1, 3) == "\x00\x00") {
-        const digest = router.get_backward_digest(relayPayload).slice(0, 4);
+        const digest = router.getBackwardDigest(relayPayload).slice(0, 4);
         // check that also the digest is correct
         if (relayPayload.slice(5, 9) == digest) {
           return relayPayload;

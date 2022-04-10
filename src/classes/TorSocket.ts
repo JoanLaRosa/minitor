@@ -4,8 +4,10 @@
 //   SocksClientChainOptions,
 // } from "socks";
 // https://www.npmjs.com/package/socks
+import * as struct from "python-struct";
 
 import { CommandTypes } from "../constants";
+import Cell from "./Cell";
 import Circuit from "./Circuit";
 import OnionRouter from "./OnionRouter";
 import RelayCell from "./RelayCell";
@@ -42,12 +44,25 @@ class TorSocket {
     this.retriveNetInfo();
   }
 
-  sendCell() {
-    return;
+  sendCell(cell: Cell) {
+    this._socket.write(cell.getBytes(this.getMaxProtocolVersion()));
   }
 
-  retrieveCell() {
-    return;
+  retrieveCell(ignoreResponse?: boolean) {
+    let circuitId = 0;
+    if (this.getMaxProtocolVersion() < 4) {
+      circuitId = Number(
+        struct.unpack("!H", this._socket.read(2))[0].valueOf()
+      );
+    } else {
+      circuitId = Number(
+        struct.unpack("!I", this._socket.read(4))[0].valueOf()
+      );
+    }
+    const command = struct.unpack("!B", this._socket.read(1))[0].valueOf();
+    let payload = "";
+    // if (
+    // return;
   }
 
   private sendVersions() {
@@ -67,26 +82,31 @@ class TorSocket {
   }
 
   retrieveRelayData(circuit: Circuit) {
-    const response = "";
-    // while (true) {
-    //   const cell = new RelayCell({ cell: this.retrieveCell() });
-    //   if (cell.command === CommandTypes.RELAY) {
-    //     cell.payload = circuit.decrypt(cell.payload);
-    //     const parsedResponse = cell.parseCell();
-    //     if (parsedResponse.command === CommandTypes.RELAY_DATA) {
-    //       const data_length = parsedResponse.length;
-    //       response += parsedResponse.data.slice(0, data_length);
-    //       if (parsedResponse.data.length < RelayCell.MAX_RELAY_SIZE) {
-    //         break;
-    //       }
-    //     }
-    //   }
-    // }
+    let response = "";
+    while (true) {
+      const cell = new RelayCell({ cell: this.retrieveCell() });
+      if (cell.command === CommandTypes.RELAY) {
+        cell.payload = circuit.decrypt(cell.payload);
+        const parsedResponse = cell.parseCell();
+        if (parsedResponse.command === CommandTypes.RELAY_DATA) {
+          const data_length = parsedResponse.length;
+          response += parsedResponse.data.slice(0, data_length);
+          if (parsedResponse.data.length < RelayCell.MAX_RELAY_SIZE) {
+            break;
+          }
+        }
+      }
+    }
     return response;
   }
 
   private sendNetInfo() {
-    this.sendCell();
+    const cell = new Cell(0, CommandTypes.NETINFO, {
+      timestamp: new Date().toISOString(),
+      otherIp: this.guardRelay.ip,
+      ourIp: this._ourPublicIp,
+    });
+    this.sendCell(cell);
   }
 }
 

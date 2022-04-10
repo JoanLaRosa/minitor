@@ -15,6 +15,9 @@ export enum CommandTypes {
   CERTS = 129,
   AUTH_CHALLENGE = 130,
   AUTHENTICATE = 131,
+}
+
+export enum RelayCommand {
   RELAY_BEGIN = 1,
   RELAY_DATA = 2,
   RELAY_END = 3,

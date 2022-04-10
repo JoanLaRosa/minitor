@@ -109,6 +109,16 @@ class Consensus {
       Math.floor(Math.random() * this._parsedConsensus.length)
     ];
   }
+
+  getRandomExitRouter() {
+    const exitRouters: OnionRouter[] = [];
+    for (const onionRouter of this._parsedConsensus) {
+      if (onionRouter?.flags?.includes("exit")) {
+        exitRouters.push(onionRouter);
+      }
+    }
+    return exitRouters[Math.floor(Math.random() * exitRouters.length)];
+  }
 }
 
 export default Consensus;
