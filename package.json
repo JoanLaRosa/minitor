@@ -12,14 +12,7 @@
     "prepublishOnly": "npm test && npm run lint",
     "preversion": "npm run lint",
     "version": "git add -A src",
-    "postversion": "git push && git push --tags",
-    "check-updates": "npx npm-check-updates",
-    "check-updates:minor": "npx npm-check-updates --target minor",
-    "check-updates:patch": "npx npm-check-updates --target patch"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/el3um4s/typescript-npm-package-starter.git"
+    "postversion": "git push && git push --tags"
   },
   "files": [
     "lib/**/*"
@@ -30,22 +23,7 @@
     "template",
     "ts"
   ],
-  "author": "Samuele C. De Tomasi",
   "license": "MIT",
-  "funding": [
-    {
-      "type": "patreon",
-      "url": "https://www.patreon.com/el3um4s"
-    },
-    {
-      "type": "individual",
-      "url": "https://www.paypal.me/el3um4s"
-    }
-  ],
-  "bugs": {
-    "url": "https://github.com/el3um4s/typescript-npm-package-starter/issues"
-  },
-  "homepage": "https://github.com/el3um4s/typescript-npm-package-starter#readme",
   "devDependencies": {
     "@types/jest": "^27.0.2",
     "@types/node": "^16.11.6",
