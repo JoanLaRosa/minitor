@@ -1,10 +1,9 @@
-import Cell from "./Cell";
-import OnionRouter from "./OnionRouter";
+import * as struct from "python-struct";
 
-import { MAX_PAYLOAD_SIZE } from "./Cell";
+import OnionRouter from "./OnionRouter";
+import Cell, { MAX_PAYLOAD_SIZE } from "./Cell";
 import { RelayCommand } from "../constants";
 import { DynamicType } from "../types";
-import struct = require("python-struct");
 
 export const MAX_RELAY_CELL_DATA = MAX_PAYLOAD_SIZE - 11;
 
