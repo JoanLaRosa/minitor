@@ -13,6 +13,7 @@
     "no-console": 1,
     "semi-style": ["error", "last"],
     "semi": [2, "always"],
+    "quotes": [2, "single"],
     "@typescript-eslint/no-explicit-any": 0
   }
 }

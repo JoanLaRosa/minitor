@@ -1,7 +1,7 @@
-import axios, { AxiosInstance } from "axios";
+import axios, { AxiosInstance } from 'axios';
 
-import DirectoryAuthority from "./DirectoryAuthority";
-import OnionRouter from "./OnionRouter";
+import DirectoryAuthority from './DirectoryAuthority';
+import OnionRouter from './OnionRouter';
 
 interface Consensus {
   _directoryAuthorities: DirectoryAuthority[];
@@ -13,21 +13,21 @@ class Consensus {
   constructor() {
     // Taken from https://consensus-health.torproject.org/
     this._directoryAuthorities = [
-      new DirectoryAuthority("maatuska", "171.25.193.9", 443, 80),
-      new DirectoryAuthority("tor26", "86.59.21.38", 80, 443),
-      new DirectoryAuthority("longclaw", "199.58.81.140", 80, 443),
-      new DirectoryAuthority("dizum", "194.109.206.212", 80, 443),
-      new DirectoryAuthority("bastet", "204.13.164.118", 80, 443),
-      new DirectoryAuthority("gabelmoo", "131.188.40.189", 80, 443),
-      new DirectoryAuthority("moria1", "128.31.0.34", 9131, 9101),
-      new DirectoryAuthority("dannenberg", "193.23.244.244", 80, 443),
-      new DirectoryAuthority("faravahar", "154.35.175.225", 80, 443),
+      new DirectoryAuthority('maatuska', '171.25.193.9', 443, 80),
+      new DirectoryAuthority('tor26', '86.59.21.38', 80, 443),
+      new DirectoryAuthority('longclaw', '199.58.81.140', 80, 443),
+      new DirectoryAuthority('dizum', '194.109.206.212', 80, 443),
+      new DirectoryAuthority('bastet', '204.13.164.118', 80, 443),
+      new DirectoryAuthority('gabelmoo', '131.188.40.189', 80, 443),
+      new DirectoryAuthority('moria1', '128.31.0.34', 9131, 9101),
+      new DirectoryAuthority('dannenberg', '193.23.244.244', 80, 443),
+      new DirectoryAuthority('faravahar', '154.35.175.225', 80, 443),
     ];
     this._parsedConsensus = [];
     this._httpClient = axios.create({
       headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
+        'User-Agent':
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36',
       },
     });
   }
@@ -44,16 +44,16 @@ class Consensus {
     let onionRouterCount = 1;
     let onionRouter: OnionRouter | null = null;
 
-    for (let line of response.data.split("\n")) {
+    for (let line of response.data.split('\n')) {
       line = line.decode();
-      if (line.startsWith("r ")) {
-        const splitLine = line.split(" ");
+      if (line.startsWith('r ')) {
+        const splitLine = line.split(' ');
         const nickname = splitLine[1];
         const ip = splitLine[6];
         const torPort = parseInt(splitLine[7]);
         const dirPort = parseInt(splitLine[8]);
-        const identity = splitLine[2] + "=".repeat(-splitLine[2].length % 4);
-        const identityBase16 = Buffer.from(identity, "base64").toString("hex");
+        const identity = splitLine[2] + '='.repeat(-splitLine[2].length % 4);
+        const identityBase16 = Buffer.from(identity, 'base64').toString('hex');
 
         if (dirPort === 0) {
           onionRouter = null;
@@ -67,18 +67,18 @@ class Consensus {
           torPort,
           identityBase16
         );
-      } else if (line.startsWith("s ")) {
+      } else if (line.startsWith('s ')) {
         if (onionRouter) {
           const flags: string[] = [];
-          for (const token of line.split(" ")) {
-            if (token == "s") {
+          for (const token of line.split(' ')) {
+            if (token == 's') {
               continue;
             }
-            flags.push(token.lower().replace("\n", ""));
+            flags.push(token.lower().replace('\n', ''));
           }
 
           if (
-            ["stable", "fast", "valid", "running"].every((flag) =>
+            ['stable', 'fast', 'valid', 'running'].every((flag) =>
               flags.includes(flag)
             )
           ) {
@@ -97,7 +97,7 @@ class Consensus {
   getRandomGuardRelay() {
     const guardRelays: OnionRouter[] = [];
     for (const onionRouter of this._parsedConsensus) {
-      if (onionRouter.nickname.includes("guard")) {
+      if (onionRouter.nickname.includes('guard')) {
         guardRelays.push(onionRouter);
       }
     }
@@ -113,7 +113,7 @@ class Consensus {
   getRandomExitRouter() {
     const exitRouters: OnionRouter[] = [];
     for (const onionRouter of this._parsedConsensus) {
-      if (onionRouter?.flags?.includes("exit")) {
+      if (onionRouter?.flags?.includes('exit')) {
         exitRouters.push(onionRouter);
       }
     }

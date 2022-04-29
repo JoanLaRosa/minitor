@@ -4,13 +4,13 @@
 //   SocksClientChainOptions,
 // } from "socks";
 // https://www.npmjs.com/package/socks
-import * as struct from "python-struct";
+import * as struct from 'python-struct';
 
-import { CommandTypes } from "../constants";
-import Cell from "./Cell";
-import Circuit from "./Circuit";
-import OnionRouter from "./OnionRouter";
-import RelayCell from "./RelayCell";
+import { CommandTypes } from '../constants';
+import Cell from './Cell';
+import Circuit from './Circuit';
+import OnionRouter from './OnionRouter';
+import RelayCell from './RelayCell';
 
 interface TorSocket {
   guardRelay: OnionRouter;
@@ -28,7 +28,7 @@ class TorSocket {
     //     ssl_version=ssl.PROTOCOL_TLSv1_2
     // )
     this._protocolVersions = [3];
-    this._ourPublicIp = "0";
+    this._ourPublicIp = '0';
     this._circuits = [];
   }
 
@@ -52,15 +52,15 @@ class TorSocket {
     let circuitId = 0;
     if (this.getMaxProtocolVersion() < 4) {
       circuitId = Number(
-        struct.unpack("!H", this._socket.read(2))[0].valueOf()
+        struct.unpack('!H', this._socket.read(2))[0].valueOf()
       );
     } else {
       circuitId = Number(
-        struct.unpack("!I", this._socket.read(4))[0].valueOf()
+        struct.unpack('!I', this._socket.read(4))[0].valueOf()
       );
     }
-    const command = struct.unpack("!B", this._socket.read(1))[0].valueOf();
-    let payload = "";
+    const command = struct.unpack('!B', this._socket.read(1))[0].valueOf();
+    const payload = '';
     // if (
     // return;
   }
@@ -82,7 +82,7 @@ class TorSocket {
   }
 
   retrieveRelayData(circuit: Circuit) {
-    let response = "";
+    let response = '';
     while (true) {
       const cell = new RelayCell({ cell: this.retrieveCell() });
       if (cell.command === CommandTypes.RELAY) {

@@ -1,6 +1,6 @@
-import axios, { AxiosInstance } from "axios";
-import * as Crypto from "crypto-js";
-import * as struct from "python-struct";
+import axios, { AxiosInstance } from 'axios';
+import * as Crypto from 'crypto-js';
+import * as struct from 'python-struct';
 
 interface OnionRouter {
   nickname: string;
@@ -33,8 +33,8 @@ class OnionRouter {
 
     this._httpClient = axios.create({
       headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
+        'User-Agent':
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36',
       },
     });
   }
@@ -45,12 +45,12 @@ class OnionRouter {
 
   async parseDescriptor() {
     const response = await this._httpClient.get(this.getDescriptorUrl());
-    for (const line of response.data.split("\n")) {
+    for (const line of response.data.split('\n')) {
       const lineDecoded = line.decode();
-      if (lineDecoded.startsWith("ntor-onion-key ")) {
-        this.keyNtor = line.split("ntor-onion-key")[1].trim();
-        if (!this.keyNtor?.endsWith("=")) {
-          this.keyNtor += "=";
+      if (lineDecoded.startsWith('ntor-onion-key ')) {
+        this.keyNtor = line.split('ntor-onion-key')[1].trim();
+        if (!this.keyNtor?.endsWith('=')) {
+          this.keyNtor += '=';
         }
       }
     }
@@ -59,7 +59,7 @@ class OnionRouter {
   setSharedSecret(data: any) {
     // TODO
     const [forwardDigest, backwardDigest, encryptionKey, decryptionKey] =
-      struct.unpack("!20s20s16s16s", data);
+      struct.unpack('!20s20s16s16s', data);
     this.forwardDigest = forwardDigest;
     this.backwardDigest = backwardDigest;
     this.encryptionKey = encryptionKey;

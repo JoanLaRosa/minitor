@@ -1,7 +1,7 @@
-import Consensus from "./classes/Consensus";
-import TorSocket from "./classes/TorSocket";
-import OnionRouter from "./classes/OnionRouter";
-import Circuit from "./classes/Circuit";
+import Consensus from './classes/Consensus';
+import TorSocket from './classes/TorSocket';
+import OnionRouter from './classes/OnionRouter';
+import Circuit from './classes/Circuit';
 
 interface MiniTor {
   _consensus: Consensus;

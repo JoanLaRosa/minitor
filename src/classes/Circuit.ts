@@ -1,11 +1,11 @@
-import { CommandTypes, RelayCommand } from "../constants";
-import { Payload } from "./Cell";
+import { CommandTypes, RelayCommand } from '../constants';
+import { Payload } from './Cell';
 
-import Cell from "./Cell";
-import RelayCell from "./RelayCell";
-import TorSocket from "./TorSocket";
+import Cell from './Cell';
+import RelayCell from './RelayCell';
+import TorSocket from './TorSocket';
 
-import * as struct from "python-struct";
+import * as struct from 'python-struct';
 
 interface Circuit {
   torSocket: any; // FIXME update to TorSocket type
@@ -37,23 +37,23 @@ class Circuit {
 
     if (cell.command != CommandTypes.CREATED2) {
       // log.error("Received command is not a CREATED2.");
-      throw new Error("Received command is not a CREATED2.");
+      throw new Error('Received command is not a CREATED2.');
     }
-    keyAgreement.complete_handshake(cell.payload["Y"], cell.payload["auth"]);
+    keyAgreement.complete_handshake(cell.payload['Y'], cell.payload['auth']);
     this.onionRouters.push(guardRelay);
 
     return;
   }
 
   createRelayCell(command, streamId, payload) {
-    let relayCell: string = struct.pack("!B", command).toString();
-    relayCell += struct.pack("!H", 0);
+    let relayCell: string = struct.pack('!B', command).toString();
+    relayCell += struct.pack('!H', 0);
     // Rather, RELAY cells that affect the
     // entire circuit rather than a particular stream use a StreamID of zero
-    relayCell += struct.pack("!H", streamId);
+    relayCell += struct.pack('!H', streamId);
     // FIXME: relay_cell += struct.pack("!4s", "\x00" * 4)
-    relayCell += struct.pack("!H", payload.length);
-    relayCell += struct.pack("!498s", payload);
+    relayCell += struct.pack('!H', payload.length);
+    relayCell += struct.pack('!498s', payload);
 
     // Calculate and replace the digest.
     const calculatedDigest = this.onionRouters[this.onionRouters.length - 1]
@@ -75,7 +75,7 @@ class Circuit {
     // FLAGS[4 bytes]
     // ADDRPORT is made of ADDRESS | ':' | PORT | [00]
     let relayPayload = `${address}:${port}`;
-    relayPayload += struct.pack("!BI", 0, 0);
+    relayPayload += struct.pack('!BI', 0, 0);
     const relayCell = this.createRelayCell(
       RelayCommand.RELAY_BEGIN,
       this.streamId,
@@ -91,12 +91,12 @@ class Circuit {
     const parsedResponse = responseCell.parseCell();
     if (parsedResponse.command !== RelayCommand.RELAY_CONNECTED) {
       // log.error("Creating a connection to the address failed.")
-      throw new Error("Creating a connection to the address failed.");
+      throw new Error('Creating a connection to the address failed.');
     }
   }
 
   sendHttpGet() {
-    const relayPayload = "GET / HTTP/1.0\r\n\r\n";
+    const relayPayload = 'GET / HTTP/1.0\r\n\r\n';
     const relayCell = this.createRelayCell(
       RelayCommand.RELAY_DATA,
       this.streamId,
@@ -116,7 +116,7 @@ class Circuit {
     // const key_agreement = KeyAgreementNTOR(onionRouter);
     let keyAgreement: any; // FIXME make KeyAgreementNTOR class
 
-    let relayPayload = struct.pack("!B", 2);
+    let relayPayload = struct.pack('!B', 2);
     // FIXME:
     // relay_payload += struct.pack(
     //   "!BB4sH",
@@ -132,7 +132,7 @@ class Circuit {
     //   b16decode(onion_router.identity.encode())
     // );
     relayPayload +=
-      struct.pack("!HH", 2, keyAgreement.getOnionSkin().length) +
+      struct.pack('!HH', 2, keyAgreement.getOnionSkin().length) +
       keyAgreement.getOnionSkin();
 
     const relayCell = this.createRelayCell(
@@ -152,12 +152,12 @@ class Circuit {
     const responseCell = new RelayCell(this.torSocket.retrieveCell());
     if (responseCell.command != CommandTypes.RELAY) {
       // log.error("Received command is not a RELAY.")
-      throw new Error("Received command is not a RELAY.");
+      throw new Error('Received command is not a RELAY.');
     }
     responseCell.payload = this.decryptPayload(responseCell.payload);
     const parsedResponse = responseCell.parseCell();
 
-    keyAgreement.completeHandshake(parsedResponse["Y"], parsedResponse["auth"]);
+    keyAgreement.completeHandshake(parsedResponse['Y'], parsedResponse['auth']);
     this.onionRouters.push(onionRouter);
   }
 
@@ -172,7 +172,7 @@ class Circuit {
     this.onionRouters.forEach((router) => {
       relayPayload = router.decrypt(relayPayload);
       // if 'recognized' = ZERO then probability is high that the relay cell was decrypted
-      if (relayPayload.slice(1, 3) == "\x00\x00") {
+      if (relayPayload.slice(1, 3) == '\x00\x00') {
         const digest = router.getBackwardDigest(relayPayload).slice(0, 4);
         // check that also the digest is correct
         if (relayPayload.slice(5, 9) == digest) {
@@ -181,7 +181,7 @@ class Circuit {
       }
     });
     // FIXME Error out here? or return empty
-    throw new Error("(Potentially incorrect throw) Failure Decrypting Payload");
+    throw new Error('(Potentially incorrect throw) Failure Decrypting Payload');
   }
 }
 

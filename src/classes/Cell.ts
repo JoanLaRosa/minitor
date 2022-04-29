@@ -1,6 +1,6 @@
-import * as struct from "python-struct";
+import * as struct from 'python-struct';
 
-import { CommandTypes } from "../constants";
+import { CommandTypes } from '../constants';
 
 const CELL_SIZE = 514;
 const MAX_PAYLOAD_SIZE = 509;
@@ -42,27 +42,27 @@ class Cell {
 
   // FIXME: change Int8Array to the bytes struct
   getBytes(maxProtocolVersion: number): string {
-    let payloadBytes = "";
+    let payloadBytes = '';
 
     if (this.command == CommandTypes.VERSIONS) {
       payloadBytes = struct
         .pack(
-          "!" + "H".repeat(this.payload.versions.length),
+          '!' + 'H'.repeat(this.payload.versions.length),
           this.payload.versions
         )
         .toString();
     } else if (this.command == CommandTypes.NETINFO) {
-      const timestamp = struct.pack("!I", this.payload.timestamp);
-      const other_or_address = "";
+      const timestamp = struct.pack('!I', this.payload.timestamp);
+      const other_or_address = '';
       //FIXME: const other_or_address =  struct.pack("!BB", 4, 4) + socket.inet_aton(this.payload["other_ip"]);
-      const number_of_addresses = struct.pack("!B", 1);
-      const this_or_address = "";
+      const number_of_addresses = struct.pack('!B', 1);
+      const this_or_address = '';
       // FIXME: const this_or_address = struct.pack("!BB", 4, 4) + socket.inet_aton(this.payload["our_ip"]);
       payloadBytes =
         timestamp + other_or_address + number_of_addresses + this_or_address;
     } else if (this.command == CommandTypes.CREATE2) {
       payloadBytes =
-        struct.pack("!HH", this.payload.type, this.payload.length) +
+        struct.pack('!HH', this.payload.type, this.payload.length) +
         this.payload.data;
     } else if (this.command in [CommandTypes.RELAY_EARLY, CommandTypes.RELAY]) {
       payloadBytes = this.payload.encryptedPayload;
@@ -71,15 +71,15 @@ class Cell {
     }
 
     if (this.isVariableLengthCommand(this.command)) {
-      let header = "";
+      let header = '';
       if (maxProtocolVersion < 4) {
         header = struct
-          .pack("!HBH", this.circuitId, this.command, payloadBytes.length)
+          .pack('!HBH', this.circuitId, this.command, payloadBytes.length)
           .toString();
       } else {
         // Link protocol 4 increases circuit ID width to 4 bytes.
         header = struct
-          .pack("!IBH", this.circuitId, this.command, payloadBytes.length)
+          .pack('!IBH', this.circuitId, this.command, payloadBytes.length)
           .toString();
       }
       return header + payloadBytes;
@@ -87,12 +87,12 @@ class Cell {
       // This is a fixed-length cell.
       if (maxProtocolVersion < 4) {
         payloadBytes = struct
-          .pack("!HB509s", this.circuitId, this.command, payloadBytes)
+          .pack('!HB509s', this.circuitId, this.command, payloadBytes)
           .toString();
       } else {
         // Link protocol 4 increases circuit ID width to 4 bytes.
         payloadBytes = struct
-          .pack("!IB509s", this.circuitId, this.command, payloadBytes)
+          .pack('!IB509s', this.circuitId, this.command, payloadBytes)
           .toString();
       }
       return payloadBytes;
